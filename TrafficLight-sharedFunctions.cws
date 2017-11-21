@@ -1,0 +1,76 @@
+function writeAction<"duration">(theAction : node, sLanguage : value) {
+  localref theEntry = theAction.crossroad_entry;
+  @  {
+@
+  switch(sLanguage) {
+    case "C++":
+      @  int durations[] = {@
+      break;
+    case "Java":
+      @  int[] durations = {@
+    }
+    foreach i in theAction.durations {
+      if !i.first() {
+        @, @
+      }
+      @@i@@
+    }
+    @, -1};
+      setDuration("@theEntry.street@", "@theEntry.crossroad@", "@theEntry.direction@", durations);
+    }
+@
+}
+
+function writeAction<"activate">(theAction : node, sLanguage : value) {
+  @  activateStrategy("@theAction.strategy@");
+@
+}
+
+function writeAction<"desactivate">(theAction : node, sLanguage : value) {
+  @  bActive_ = false;
+@
+}
+
+function convertAntecedent2Cpp(sAntecedent : value) {
+  return translateString({
+    #implicitCopy // what you scan is what you get
+    antecedent ::=
+      [
+        // consume strings: may contain 'vehicles_hour', wont transform into message
+        #readCString
+        |
+        #readIdentifier:sId
+        [
+          // facultative sequence: transform if keyword is 'vehicles_hour'
+          #check(sId == "vehicles_hour")
+          #continue // from here syntax needs to be correct
+          '('
+          // stop copying the output as scanned
+          #explicitCopy
+          // parse coordinates of a sensor
+          => local theSegment;
+          street_segment(theSegment)
+          ')'
+          =>  {
+                // the transformation itself
+                @"@theSegment.street@", "@theSegment.crossroad@", "@theSegment.direction@")@
+              }
+      ]?
+    |
+    // reading of char if end of string not reached
+    ~#empty
+    ]*
+    ;
+  street_segment(theSegment : node) ::= 
+    #readIdentifier:theSegment.crossroad
+    #continue "->"
+    => insert theSegment.direction = "c->s";
+    #readCString:theSegment.street
+    |
+    #readCString:theSegment.street
+    #continue "->"
+    => insert theSegment.direction = "s->c";
+    #readIdentifier:theSegment.crossroad
+    ;
+  }, this, sAntecedent);
+}

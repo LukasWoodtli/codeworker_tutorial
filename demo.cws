@@ -1,0 +1,26 @@
+
+// iterate all strategy files with extension 'tlc'
+
+forfile strategyFile in "*.tlc" {
+
+  // BNF parse script "TrafficLight.cwp" applies on strategy file
+  // and populates global variable 'project'
+  parseAsBNF("TrafficLight.cwp", project, strategyFile);
+
+  // iterate all strategies, genrate C++ headers, body and picture
+  foreach i in project.strategies {
+    generate("TrafficLight-headerC++.cwt", i, "output/" + i.name + ".h");
+    generate("TrafficLight-bodyC++.cwt",   i, "output/" + i.name + ".cpp");
+
+    // generate image
+    //generate("TrafficLight-Graphviz.cwt", i, i.name + ".grz");
+  //  system("dot -Tpng -o " + i.name + ".png " + i.name + ".grz");
+  }
+
+  // Generate document
+//  translate("TrafficLight2Openoffice20.cwp", project, strategyFile, "openOffice2.0/content.xml");
+}
+
+//expand("TrafficLight-embeddedJava.cwt", project, "TrafficLightSimulator.java");
+
+saveProject("strategies.xml");

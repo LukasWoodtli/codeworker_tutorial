@@ -1,0 +1,12 @@
+
+strategy BusinessDayNight {
+  start time() > (17*60 + 30)*60 /* 17:30 in seconds */;
+
+  vehicles_hour(place_opera->"Boulevard des Capuciens") < 400
+    => duration(scribe->"Rue Scribe", 1min05/2min00);
+  vehicles_hour("Rue de la Paix"->rue_paix) > 300
+    => activate(RivoliLowDensity);
+  vehicles_hour(auber->"Rue auber") > 500 => desactivate;
+
+  time() > (22*60 + 30)*60 /* 22:30 in seconds */ => desactivate;
+}
