@@ -11,10 +11,6 @@ forfile strategyFile in "*.tlc" {
   foreach i in project.strategies {
     generate("TrafficLight-headerC++.cwt", i, "output/" + i.name + ".h");
     generate("TrafficLight-bodyC++.cwt",   i, "output/" + i.name + ".cpp");
-
-    // generate image
-    //generate("TrafficLight-Graphviz.cwt", i, i.name + ".grz");
-  //  system("dot -Tpng -o " + i.name + ".png " + i.name + ".grz");
   }
 
   // Generate document
