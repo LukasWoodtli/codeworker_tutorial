@@ -17,6 +17,6 @@ forfile strategyFile in "*.tlc" {
 //  translate("TrafficLight2Openoffice20.cwp", project, strategyFile, "openOffice2.0/content.xml");
 }
 
-//expand("TrafficLight-embeddedJava.cwt", project, "TrafficLightSimulator.java");
+expand("TrafficLight-embeddedJava.cwt", project, "TrafficLightSimulator.java");
 
 saveProject("strategies.xml");

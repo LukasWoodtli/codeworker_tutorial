@@ -1,0 +1,71 @@
+@
+#include "TrafficLight-sharedFunctions.cws"
+
+function generateJavaClass(strategy : node) {
+	@class @strategy.name@ extends TrafficLightStrategy {
+		public @strategy.name@ () {}
+
+		public bool start() {
+			return @strategy.start@;
+	}
+
+	public int executeRules() {
+		int iTriggeredRules = 0;
+		if (bActive_) {
+@
+	incrementIndentLevel();
+	foreach i in strategy.rules {
+		@		if (executeRule@i.key()@()) ++iTriggeredRules;
+@
+	}
+	@	}
+	return iTriggeredRules;
+}
+
+@
+
+	foreach i in strategy.rules {
+		@private bool executeRule@i.key()@() {
+	if (@convertAntecedent2Cpp(i.condition)@ == false) {
+			return false;
+	}
+@
+		foreach j in i.actions {
+			writeAction<j>(j, "Java");
+		}
+		@	return true;
+}
+
+@
+	}
+	decrementIndentLevel();
+	@}
+
+@
+}
+
+if getMarkupKey() == "strategies" {
+  foreach strategy in this.strategies {
+    generateJavaClass(strategy);
+  }
+} else if startString(getMarkupKey(), "DSL: ") {
+  // the current markup key embeds strategies
+  // written directly in the Java file
+  if subString(getMarkupKey(), 5) != "trafficlight" {
+	error("only 'TrafficLight' DSL recognized for now!");
+  }
+
+  // parsing strategies attached to markup
+  // 'getMarkupValue()' returns data embedded in the markup
+  local theParseTree;
+  parseStringAsBNF("TrafficLight.cwp", theParseTree, getMarkupValue());
+
+  @*/
+@
+  foreach strategy in theParseTree.strategies {
+    generateJavaClass(strategy);
+  }
+  @/*
+@
+}
+
